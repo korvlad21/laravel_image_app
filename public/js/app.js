@@ -5348,7 +5348,9 @@ __webpack_require__.r(__webpack_exports__);
       });
       data.append('title', this.title);
       this.title = '';
-      axios.post('/api/posts', data);
+      axios.post('/api/posts', data).then(function (res) {
+        _this.getPosts();
+      });
     },
     getPosts: function getPosts() {
       var _this2 = this;
@@ -5422,6 +5424,11 @@ var render = function render() {
     return _c("div", {
       staticClass: "mb-3"
     }, [_c("img", {
+      staticClass: "mb-3",
+      attrs: {
+        src: image.preview_url
+      }
+    }), _vm._v(" "), _c("img", {
       attrs: {
         src: image.url
       }
