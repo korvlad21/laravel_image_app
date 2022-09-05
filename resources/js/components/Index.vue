@@ -35,7 +35,8 @@ export default {
             dropzone: null,
             title: null,
             post: null,
-            content: null
+            content: null,
+            imageIdsForDelete:[]
         }
     },
 
@@ -44,14 +45,18 @@ export default {
     },
 
     mounted() {
-        this.getPosts()
+        
         this.dropzone = new Dropzone(this.$refs.dropzone, {
             url: '/api/posts',
             autoProcessQueue: true,
             addRemoveLinks: true
 
         })
-        
+        this.dropzone.on('removedfile', (file)=> {
+            this.imageIdsForDelete.push(file.id)
+
+        })
+        this.getPosts()
     },
 
     methods:{
@@ -62,8 +67,14 @@ export default {
                 data.append('images[]', file)
                 this.dropzone.removeFile(file)
             })
+            
+            this.imageIdsForDelete.forEach(idForDelete =>{
+                data.append('image_ids_for_delete[]', idForDelete)
+            })
+
             data.append('title', this.title)
             data.append('content', this.content)
+            
             data.append('_method', 'PATCH')
             this.title = '';
             this.content = '';
@@ -80,7 +91,7 @@ export default {
                 this.title = this.post.title
                 this.content = this.post.content
                 this.post.images.forEach( image =>{
-                    let file = { name: image.name, size: image.size };
+                    let file = {id: image.id, name: image.name, size: image.size };
                     this.dropzone.displayExistingFile(file, image.preview_url);
                 })
                 

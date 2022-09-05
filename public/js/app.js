@@ -5324,30 +5324,39 @@ __webpack_require__.r(__webpack_exports__);
       dropzone: null,
       title: null,
       post: null,
-      content: null
+      content: null,
+      imageIdsForDelete: []
     };
   },
   components: {
     VueEditor: vue2_editor__WEBPACK_IMPORTED_MODULE_1__.VueEditor
   },
   mounted: function mounted() {
-    this.getPosts();
+    var _this = this;
+
     this.dropzone = new dropzone__WEBPACK_IMPORTED_MODULE_0__["default"](this.$refs.dropzone, {
       url: '/api/posts',
       autoProcessQueue: true,
       addRemoveLinks: true
     });
+    this.dropzone.on('removedfile', function (file) {
+      _this.imageIdsForDelete.push(file.id);
+    });
+    this.getPosts();
   },
   methods: {
     update: function update() {
-      var _this = this;
+      var _this2 = this;
 
       var data = new FormData();
       var files = this.dropzone.getAcceptedFiles();
       files.forEach(function (file) {
         data.append('images[]', file);
 
-        _this.dropzone.removeFile(file);
+        _this2.dropzone.removeFile(file);
+      });
+      this.imageIdsForDelete.forEach(function (idForDelete) {
+        data.append('image_ids_for_delete[]', idForDelete);
       });
       data.append('title', this.title);
       data.append('content', this.content);
@@ -5355,24 +5364,25 @@ __webpack_require__.r(__webpack_exports__);
       this.title = '';
       this.content = '';
       axios.post("/api/posts/".concat(this.post.id), data).then(function (res) {
-        _this.getPosts();
+        _this2.getPosts();
       });
     },
     getPosts: function getPosts() {
-      var _this2 = this;
+      var _this3 = this;
 
       axios.get('/api/posts').then(function (res) {
-        _this2.post = res.data.data;
-        _this2.title = _this2.post.title;
-        _this2.content = _this2.post.content;
+        _this3.post = res.data.data;
+        _this3.title = _this3.post.title;
+        _this3.content = _this3.post.content;
 
-        _this2.post.images.forEach(function (image) {
+        _this3.post.images.forEach(function (image) {
           var file = {
+            id: image.id,
             name: image.name,
             size: image.size
           };
 
-          _this2.dropzone.displayExistingFile(file, image.preview_url);
+          _this3.dropzone.displayExistingFile(file, image.preview_url);
         });
       });
     },
