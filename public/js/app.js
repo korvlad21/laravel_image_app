@@ -5325,7 +5325,8 @@ __webpack_require__.r(__webpack_exports__);
       title: null,
       post: null,
       content: null,
-      imageIdsForDelete: []
+      imageIdsForDelete: [],
+      imageUrlsForDelete: []
     };
   },
   components: {
@@ -5358,12 +5359,21 @@ __webpack_require__.r(__webpack_exports__);
       this.imageIdsForDelete.forEach(function (idForDelete) {
         data.append('image_ids_for_delete[]', idForDelete);
       });
+      this.imageUrlsForDelete.forEach(function (urlForDelete) {
+        data.append('image_urls_for_delete[]', urlForDelete);
+      });
       data.append('title', this.title);
       data.append('content', this.content);
       data.append('_method', 'PATCH');
       this.title = '';
       this.content = '';
       axios.post("/api/posts/".concat(this.post.id), data).then(function (res) {
+        var previws = _this2.dropzone.previewsContainer.querySelectorAll('.dz-image-preview');
+
+        previws.forEach(function (preview) {
+          preview.remove();
+        });
+
         _this2.getPosts();
       });
     },
@@ -5397,6 +5407,9 @@ __webpack_require__.r(__webpack_exports__);
       })["catch"](function (err) {
         console.log(err);
       });
+    },
+    handleImageRemoved: function handleImageRemoved(url) {
+      this.imageUrlsForDelete.push(url);
     }
   }
 });
@@ -5452,6 +5465,7 @@ var render = function render() {
       useCustomImageHandler: ""
     },
     on: {
+      "image-removed": _vm.handleImageRemoved,
       "image-added": _vm.handleImageAdded
     },
     model: {
@@ -12772,7 +12786,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.dz-success-mark,\r\n.dz-error-mark{\r\n    display: none;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.dz-success-mark,\r\n.dz-error-mark {\r\n    display: none;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

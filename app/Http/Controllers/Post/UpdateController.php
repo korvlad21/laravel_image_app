@@ -15,9 +15,13 @@ class UpdateController extends Controller
     public function __invoke(UpdateRequest $request, Post $post)
     {
         $data = $request->validated();
+        
         $images = isset($data['images']) ? $data['images'] : null;
         $imageIdsForDelete = isset($data['image_ids_for_delete']) ? $data['image_ids_for_delete'] : null;
-        unset($data['images'], $data['image_ids_for_delete']);
+        $imageUrlsForDelete = isset($data['image_urls_for_delete']) ? $data['image_urls_for_delete'] : null;
+        
+        unset($data['images'], $data['image_ids_for_delete'], $data['image_urls_for_delete']);
+        $post->update($data);
         $currentImages = $post->images;
         if($imageIdsForDelete){
             foreach($currentImages as $currentImage)
@@ -30,7 +34,16 @@ class UpdateController extends Controller
                 }
             }
         }
-       
+        if($imageUrlsForDelete)
+        {
+            foreach ($imageUrlsForDelete as $imageUrlForDelete)
+            {
+                $removeStr=$request->root().'/storage/';
+                $path=str_replace($removeStr,'',$imageUrlForDelete);
+                Storage::disk('public')->delete($path);
+
+            }
+        }
 
         if($images){
            
